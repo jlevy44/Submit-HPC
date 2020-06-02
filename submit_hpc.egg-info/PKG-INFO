@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: submit-hpc
-Version: 0.1
+Version: 0.1.1
 Summary: Collection of growing job submission scripts, not to replace workflow specifications.
 Home-page: https://github.com/jlevy44/Submit-HPC
 Author: Joshua Levy
