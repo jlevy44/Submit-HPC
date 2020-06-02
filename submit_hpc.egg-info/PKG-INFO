@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: submit-hpc
+Version: 0.1
+Summary: Collection of growing job submission scripts, not to replace workflow specifications.
+Home-page: https://github.com/jlevy44/Submit-HPC
+Author: Joshua Levy
+Author-email: joshualevy44@berkeley.edu
+License: MIT
+Description: # Submit-HPC
+         Growing list of submission scripts for HPC for quick hacking.
+        
+Platform: UNKNOWN
+Description-Content-Type: text/markdown

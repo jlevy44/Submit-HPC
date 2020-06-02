@@ -1,0 +1,11 @@
+README.md
+setup.py
+submit_hpc/__init__.py
+submit_hpc/job_generator.py
+submit_hpc/job_runner.py
+submit_hpc.egg-info/PKG-INFO
+submit_hpc.egg-info/SOURCES.txt
+submit_hpc.egg-info/dependency_links.txt
+submit_hpc.egg-info/entry_points.txt
+submit_hpc.egg-info/requires.txt
+submit_hpc.egg-info/top_level.txt

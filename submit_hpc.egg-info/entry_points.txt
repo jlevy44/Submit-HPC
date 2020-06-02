@@ -1,0 +1,3 @@
+[console_scripts]
+submit-job = submit_hpc.job_runner:job
+
