@@ -33,12 +33,12 @@ def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu):
     if isinstance(additions,(list,tuple)):
         additions='\n'.join(additions)
 
-    replace_dict = {'COMMAND':"{} {}".format('CUDA_VISIBLE_DEVICES="$gpuNum"' if use_gpu else '',command),
+    replace_dict = {'COMMAND':command,
                 'GPU_SETUP':"""gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
 unset CUDA_VISIBLE_DEVICES
 export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '',
-                'NGPU':'#PBS -l gpus={}'.format(ngpu) if (use_gpu and ngpu) else '',
-                'USE_GPU':"#PBS -l feature=gpu" if use_gpu else '',
+                'NGPU':f'#PBS -l gpus={ngpu}' if (use_gpu and ngpu) else '',
+                'USE_GPU':"#PBS -l feature=gpu" if (use_gpu and ngpu) else '',
                 'TIME':str(time),'QUEUE':queue,'ADDITIONS':additions}
     return replace_dict
 
@@ -73,8 +73,8 @@ COMMAND"""
         txt = txt.replace(k,v)
     with open('torque_job.sh','w') as f:
         f.write(txt)
-    job=os.popen("mksub {} {}".format('torque_job.sh',additional_options)).read().strip('\n')
-    print("Submitted job: {}".format(job))
+    job=os.popen(f"mksub torque_job.sh {additional_options}").read().strip('\n')
+    print(f"Submitted job: {job}")
     return job
 
 def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, additional_options=""):
