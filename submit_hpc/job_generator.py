@@ -39,7 +39,9 @@ def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_g
                 'IMPORTS':imports,
                 'GPU_SETUP':("""gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
 unset CUDA_VISIBLE_DEVICES
-export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail else "export gpuNum=$(nvgpu available -l 1); while [ -z $(echo $gpuNum) ]; do export gpuNum=$(nvgpu available -l 1); done",
+export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail else """export gpuNum=$(nvgpu available -l 1); while [ -z $(echo $gpuNum) ]; do export gpuNum=$(nvgpu available -l 1); done
+                unset CUDA_VISIBLE_DEVICES
+                export CUDA_VISIBLE_DEVICES=$gpuNum""",
                 'NGPU':f'#PBS -l gpus={ngpu}' if (use_gpu and ngpu) else '',
                 'USE_GPU':"#PBS -l feature=gpu" if (use_gpu and ngpu) else '',
                 'TIME':str(time),'QUEUE':queue,'ADDITIONS':additions}
