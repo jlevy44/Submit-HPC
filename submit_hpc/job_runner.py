@@ -16,7 +16,7 @@ def job():
 @click.option('-t', '--time', default=1, help='Walltime in hours for job.', show_default=True)
 @click.option('-n', '--ngpu', default=0, help='Number of gpus to request.', show_default=True)
 @click.option('-ao', '--additional_options', default='', help='Additional options to add for torque run.', type=click.Path(exists=False))
-@click.option('-self_gpu_avail', '--sg', is_flag=True, help='Replaces GPU search command for gpu and enforces while loop. Requires installation and import of nvgpu.', show_default=True)
+@click.option('-sg', '--self_gpu_avail', is_flag=True, help='Replaces GPU search command for gpu and enforces while loop. Requires installation and import of nvgpu.', show_default=True)
 @click.option('-i', '--imports', multiple=True, default=[''], help='Place above gpu assignment to make additional import statements.', show_default=True)
 def run_torque_job(command, use_gpu, additions, queue, time, ngpu, additional_options,self_gpu_avail,imports):
     """Run torque job."""
