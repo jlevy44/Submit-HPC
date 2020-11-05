@@ -6,7 +6,7 @@ Wraps and runs your commands through torque.
 
 import os
 
-def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu):
+def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports):
     """Create dictionary to update BASH submission script for torque.
 
     Parameters
@@ -32,11 +32,14 @@ def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu):
     """
     if isinstance(additions,(list,tuple)):
         additions='\n'.join(additions)
+    if isinstance(imports,(list,tuple)):
+        imports='\n'.join(imports)
 
     replace_dict = {'COMMAND':command,
-                'GPU_SETUP':"""gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
+                'IMPORTS':imports,
+                'GPU_SETUP':("""gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
 unset CUDA_VISIBLE_DEVICES
-export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '',
+export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail else "export gpuNum=$(nvgpu available -l 1); while [ -z $(echo $gpuNum) ]; do export gpuNum=$(nvgpu available -l 1); done",
                 'NGPU':f'#PBS -l gpus={ngpu}' if (use_gpu and ngpu) else '',
                 'USE_GPU':"#PBS -l feature=gpu" if (use_gpu and ngpu) else '',
                 'TIME':str(time),'QUEUE':queue,'ADDITIONS':additions}
@@ -66,6 +69,7 @@ USE_GPU
 #PBS -l walltime=TIME:00:00
 #PBS -j oe
 cd $PBS_O_WORKDIR
+IMPORTS
 GPU_SETUP
 ADDITIONS
 COMMAND"""
@@ -77,7 +81,7 @@ COMMAND"""
     print(f"Submitted job: {job}")
     return job
 
-def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, additional_options=""):
+def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, additional_options="",):
     """Runs torque job after passing commands to setup bash file.
 
     Parameters
@@ -103,5 +107,5 @@ def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, addition
         Custom job name.
 
     """
-    job = run_torque_job_(assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu),additional_options)
+    job = run_torque_job_(assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu),additional_options, self_gpu_avail, imports)
     return job
