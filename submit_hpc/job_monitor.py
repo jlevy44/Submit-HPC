@@ -28,7 +28,7 @@ def monitor_job_completion(job_id,user,timeout=1000,sleep=0,verbose=False):
             job_status=jobs.loc[job_id,"S"]
             job_running=(job_status=="R")
         if job_status=="C": break
-        if verbose: print(f"Job {job_id} Status: {job_status}, Elapsed Time: [{round(time_elapsed,2)}/{timeout}]",flush=True)
+        if verbose: print(f"Job {job_id} Status: {job_status}, Time Elapsed: [{round(time_elapsed,2)}/{timeout}]",flush=True)
 
     while job_running:
         time_elapsed=time.time()-start
@@ -38,6 +38,6 @@ def monitor_job_completion(job_id,user,timeout=1000,sleep=0,verbose=False):
         job_running = not any([jobs is None,job_id not in jobs.index,jobs.loc[job_id,"S"]!="R"])
         if isinstance(jobs,pd.DataFrame) and job_id in jobs.index:
             job_status=jobs.loc[job_id,"S"]
-        if verbose: print(f"Job {job_id} Status: {job_status}, Elapsed Time: [{round(time_elapsed,2)}/{timeout}]",flush=True)
+        if verbose: print(f"Job {job_id} Status: {job_status}, Time Elapsed: [{round(time_elapsed,2)}/{timeout}]",flush=True)
 
     return job_id,job_status
