@@ -46,7 +46,7 @@ export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail
                 'TIME':str(time),'QUEUE':queue,'ADDITIONS':additions}
     return replace_dict
 
-def run_torque_job_(replace_dict, additional_options="", monitor_job=False, user='', sleep=3, verbose=False):
+def submit_torque_job(replace_dict, additional_options="", monitor_job=False, user='', sleep=3, verbose=False):
     """Run torque job after creating submission script.
 
     Parameters

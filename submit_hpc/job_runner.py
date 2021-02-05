@@ -8,6 +8,14 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h','--help'], max_content_width=90)
 def job():
     pass
 
+def run_torque_job_(command, use_gpu, additions, queue, time, ngpu, additional_options,self_gpu_avail,imports,monitor_job,user,sleep,verbose):
+    if isinstance(additions,tuple):
+        additions=list(additions)
+    elif isinstance(additions,str):
+        additions=[additions]
+    replace_dict = assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports)
+    submit_torque_job(replace_dict, additional_options, monitor_job, user, sleep, verbose)
+
 @job.command()
 @click.option('-c', '--command', default='', help='Command to execute through torque.', show_default=True)
 @click.option('-gpu', '--use_gpu', is_flag=True, help='Specify whether to use GPUs.', show_default=True)
@@ -24,12 +32,7 @@ def job():
 @click.option('-v', '--verbose', is_flag=True, help='Verbose output job monitoring?', show_default=True)
 def run_torque_job(command, use_gpu, additions, queue, time, ngpu, additional_options,self_gpu_avail,imports,monitor_job,user,sleep,verbose):
     """Run torque job."""
-    if isinstance(additions,tuple):
-        additions=list(additions)
-    elif isinstance(additions,str):
-        additions=[additions]
-    replace_dict = assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports)
-    run_torque_job_(replace_dict, additional_options, monitor_job, user, sleep, verbose)
+    run_torque_job_(command, use_gpu, additions, queue, time, ngpu, additional_options,self_gpu_avail,imports,monitor_job,user,sleep,verbose)
 
 if __name__ == '__main__':
     job()
