@@ -12,7 +12,7 @@ setup(name='submit_hpc',
       entry_points={
             'console_scripts':['submit-job=submit_hpc.job_runner:job']
       },
+      packages=['submit_hpc'],
       long_description=long_description,
       long_description_content_type='text/markdown',
-      packages=['submit_hpc'],
-      install_requires=['click'])
+      install_requires=['click','pandas'])

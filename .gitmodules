@@ -1,0 +1,3 @@
+[submodule "submit_hpc/external/qsub_utils"]
+	path = submit_hpc/external/qsub_utils
+	url = https://github.com/jlevy44/util

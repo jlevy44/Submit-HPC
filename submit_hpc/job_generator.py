@@ -5,6 +5,7 @@ Wraps and runs your commands through torque.
 """
 
 import os
+from submit_hpc.job_monitor import monitor_job_completion
 
 def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports):
     """Create dictionary to update BASH submission script for torque.
@@ -45,7 +46,7 @@ export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail
                 'TIME':str(time),'QUEUE':queue,'ADDITIONS':additions}
     return replace_dict
 
-def run_torque_job_(replace_dict, additional_options=""):
+def run_torque_job_(replace_dict, additional_options="", monitor_job=False, user='', sleep=3):
     """Run torque job after creating submission script.
 
     Parameters
@@ -78,8 +79,13 @@ COMMAND"""
     with open('torque_job.sh','w') as f:
         f.write(txt)
     job=os.popen(f"mksub torque_job.sh {additional_options}").read().strip('\n')
+    job_id=job.split(".")[0]
+    completion_status=None
     print(f"Submitted job: {job}")
-    return job
+    if monitor_job:
+        print(f"Monitoring job: {job}")
+        job_id, completion_status=monitor_job_completion(job_id,user,timeout=int(replace_dict['TIME'])*3600,sleep=sleep)
+    return job, job_id, completion_status
 
 def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, additional_options="",):
     """Runs torque job after passing commands to setup bash file.
