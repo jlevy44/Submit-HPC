@@ -15,7 +15,7 @@ def qstat(user=''):
         jobs=None
     return jobs
 
-def monitor_job_completion(job_id,user,timeout=1000,sleep=0):
+def monitor_job_completion(job_id,user,timeout=1000,sleep=0,verbose=False):
     start=time.time()
     job_running=False
     job_status="N"
@@ -28,6 +28,7 @@ def monitor_job_completion(job_id,user,timeout=1000,sleep=0):
             job_status=jobs.loc[job_id,"S"]
             job_running=(job_status=="R")
         if job_status=="C": break
+        if verbose: print(f"Job {job_id} Status: {job_status}",flush=True)
 
     while job_running:
         time_elapsed=time.time()-start
@@ -37,5 +38,6 @@ def monitor_job_completion(job_id,user,timeout=1000,sleep=0):
         job_running = not any([jobs is None,job_id not in jobs.index,jobs.loc[job_id,"S"]!="R"])
         if isinstance(jobs,pd.DataFrame) and job_id in jobs.index:
             job_status=jobs.loc[job_id,"S"]
+        if verbose: print(f"Job {job_id} Status: {job_status}",flush=True)
 
     return job_id,job_status
