@@ -139,6 +139,6 @@ def assemble_submit_slurm(job_dict):
     """
     with open("slurm_job.sh",'w') as f:
         f.write(directives)
-    job=os.popen(f"sbatch slurm_job.sh {job_dict.get(additional_options,'')}").read().strip('\n')
+    job=os.popen(f"sbatch slurm_job.sh {job_dict.get('additional_options','')}").read().strip('\n')
     print(job)
     return job
