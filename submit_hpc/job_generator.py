@@ -125,7 +125,8 @@ def assemble_submit_slurm(job_dict):
 #SBATCH --cpus-per-task=1
 #SBATCH --time={job_dict.get("time",1)}:00:00
 #SBATCH --job-name={job_dict.get("name","slurm_job")}
-{f"#SBATCH --gres=gpu:{job_dict.get('ngpus',0)}") if job_dict.get("ngpus",0) else ""}
+{f"#SBATCH --gpus={job_dict.get('ngpus',0)}") if job_dict.get("ngpus",0) else ""}
+#SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
 #SBATCH --gpu_cmode={job_dict.get("gpu_share_mode","exclusive")}
 {f"#SBATCH --gres=gpu:{job_dict.get('account',"")}") if job_dict.get("account","") else ""}
 {"#SBATCH --partition={}".format(job_dict.get("partition","")) if job_dict.get("partition","") else ""}
