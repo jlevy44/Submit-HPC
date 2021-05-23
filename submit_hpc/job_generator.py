@@ -135,6 +135,7 @@ def assemble_submit_slurm(job_dict):
 {account_txt}
 {partition_txt}
 {gpu_sharing_mode_txt if False else ""}
+cd {job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
 {job_dict.get("imports","")}
 {job_dict.get("additions","")}
 {job_dict.get("command","")}
