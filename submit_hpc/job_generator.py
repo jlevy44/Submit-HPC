@@ -118,6 +118,9 @@ def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, addition
     return job
 
 def assemble_submit_slurm(job_dict):
+    gpu_txt=f"#SBATCH --gpus={job_dict.get('ngpus',0)}") if job_dict.get("ngpus",0) else ""
+    account_txt=f"#SBATCH --account={job_dict.get('account',"")}") if job_dict.get("account","") else ""
+    partition_txt="#SBATCH --partition={}".format(job_dict.get("partition","")) if job_dict.get("partition","") else ""
     directives=f"""#!/bin/bash
 #SBATCH --chdir={job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
 #SBATCH --nodes={job_dict.get("nodes",1)}
@@ -125,11 +128,11 @@ def assemble_submit_slurm(job_dict):
 #SBATCH --cpus-per-task=1
 #SBATCH --time={job_dict.get("time",1)}:00:00
 #SBATCH --job-name={job_dict.get("name","slurm_job")}
-{f"#SBATCH --gpus={job_dict.get('ngpus',0)}") if job_dict.get("ngpus",0) else ""}
+{gpu_txt}
 #SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
 #SBATCH --gpu_cmode={job_dict.get("gpu_share_mode","exclusive")}
-{f"#SBATCH --gres=gpu:{job_dict.get('account',"")}") if job_dict.get("account","") else ""}
-{"#SBATCH --partition={}".format(job_dict.get("partition","")) if job_dict.get("partition","") else ""}
+{account_txt}
+{partition_txt}
 {job_dict.get("imports","")}
 {job_dict.get("additions","")}
 {job_dict.get("command","")}
