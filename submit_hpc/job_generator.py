@@ -7,7 +7,7 @@ Wraps and runs your commands through torque.
 import os
 from submit_hpc.job_monitor import monitor_job_completion
 
-def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports):
+def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports, work_dir):
     """Create dictionary to update BASH submission script for torque.
 
     Parameters
@@ -38,6 +38,7 @@ def assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_g
 
     replace_dict = {'COMMAND':command,
                 'IMPORTS':imports,
+                'WORKDIR':work_dir,
                 'GPU_SETUP':("""gpuNum=`cat $PBS_GPUFILE | sed -e 's/.*-gpu//g'`
 unset CUDA_VISIBLE_DEVICES
 export CUDA_VISIBLE_DEVICES=$gpuNum""" if use_gpu else '') if not self_gpu_avail else """export gpuNum=$(nvgpu available | tr ',' '\\n' | shuf | head -n 1); while [ -z $(echo $gpuNum) ]; do export gpuNum=$(nvgpu available | tr ',' '\\n' | shuf | head -n 1); done""",
@@ -69,7 +70,7 @@ NGPU
 USE_GPU
 #PBS -l walltime=TIME:00:00
 #PBS -j oe
-cd $PBS_O_WORKDIR
+cd WORKDIR
 IMPORTS
 GPU_SETUP
 ADDITIONS
@@ -114,4 +115,26 @@ def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, addition
 
     """
     job = run_torque_job_(assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu),additional_options, self_gpu_avail, imports)
+    return job
+
+def assemble_submit_slurm(job_dict):
+    directives=f"""#!/bin/bash
+#SBATCH --chdir={job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
+#SBATCH --nodes={job_dict.get("nodes",1)}
+#SBATCH --ntasks-per-node={job_dict.get("ppn",1)}
+#SBATCH --cpus-per-task=1
+#SBATCH --time={job_dict.get("time",1)}:00:00
+#SBATCH --job-name={job_dict.get("name","slurm_job")}
+{f"#SBATCH --gres=gpu:{job_dict.get('ngpus',0)}") if job_dict.get("ngpus",0) else ""}
+#SBATCH --gpu_cmode={job_dict.get("gpu_share_mode","exclusive")}
+{f"#SBATCH --gres=gpu:{job_dict.get('account',"")}") if job_dict.get("account","") else ""}
+{"#SBATCH --partition={}".format(job_dict.get("partition","")) if job_dict.get("partition","") else ""}
+{job_dict.get("imports","")}
+{job_dict.get("additions","")}
+{job_dict.get("command","")}
+    """
+    with open("slurm_job.sh",'w') as f:
+        f.write(directives)
+    job=os.popen(f"sbatch slurm_job.sh {additional_options}").read().strip('\n')
+    print(job)
     return job
