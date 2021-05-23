@@ -121,6 +121,7 @@ def assemble_submit_slurm(job_dict):
     gpu_txt=f"#SBATCH --gpus={job_dict.get('ngpus',0)}" if job_dict.get("ngpus",0) else ""
     account_txt=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
     partition_txt=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
+    gpu_sharing_mode_txt=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}"
     directives=f"""#!/bin/bash
 #SBATCH --chdir={job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
 #SBATCH --nodes={job_dict.get("nodes",1)}
@@ -130,9 +131,9 @@ def assemble_submit_slurm(job_dict):
 #SBATCH --job-name={job_dict.get("name","slurm_job")}
 {gpu_txt}
 #SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
-#SBATCH --gpu_cmode={job_dict.get("gpu_share_mode","exclusive")}
 {account_txt}
 {partition_txt}
+{gpu_sharing_mode_txt if False else ""}
 {job_dict.get("imports","")}
 {job_dict.get("additions","")}
 {job_dict.get("command","")}
