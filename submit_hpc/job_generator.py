@@ -122,15 +122,16 @@ def assemble_submit_slurm(job_dict):
     account_txt=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
     partition_txt=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
     gpu_sharing_mode_txt=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}"
+    deprecated_options=f"""#SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
+#SBATCH --cpus-per-task=1
+"""
     directives=f"""#!/bin/bash
 #SBATCH --chdir={job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
 #SBATCH --nodes={job_dict.get("nodes",1)}
 #SBATCH --ntasks-per-node={job_dict.get("ppn",1)}
-#SBATCH --cpus-per-task=1
 #SBATCH --time={job_dict.get("time",1)}:00:00
-#SBATCH --job-name={job_dict.get("name","slurm_job")}
+#SBATCH --job-name={(job_dict.get("name","slurm_job") if job_dict.get("name","") else "")}
 {gpu_txt}
-#SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
 {account_txt}
 {partition_txt}
 {gpu_sharing_mode_txt if False else ""}
