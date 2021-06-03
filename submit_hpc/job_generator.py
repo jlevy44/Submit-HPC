@@ -122,7 +122,7 @@ def assemble_submit_slurm(job_dict):
     account_txt=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
     partition_txt=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
     gpu_sharing_mode_txt=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}"
-    nodes_txt=f"#SBATCH --nodes={job_dict.get("nodes",1)}" if job_dict.get("nodes",1) else ""
+    nodes_txt=f"#SBATCH --nodes={job_dict.get('nodes',1)}" if job_dict.get("nodes",1) else ""
     deprecated_options=f"""#SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
 #SBATCH --cpus-per-task=1
 """
