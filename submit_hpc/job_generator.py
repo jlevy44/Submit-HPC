@@ -118,7 +118,7 @@ def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, addition
     return job
 
 def assemble_submit_slurm(job_dict):
-    gpu_txt=f"#SBATCH --gpus={job_dict.get('ngpus',0)}" if job_dict.get("ngpus",0) else ""
+    gpu_txt=f"#SBATCH --gres=gpu:{job_dict.get('ngpus',0)}" if job_dict.get("ngpus",0) else "" # --gpus=
     account_txt=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
     partition_txt=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
     gpu_sharing_mode_txt=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}"
