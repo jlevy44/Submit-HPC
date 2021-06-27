@@ -16,7 +16,7 @@ def run_torque_job_(command, use_gpu, additions, queue, time, ngpu, additional_o
     replace_dict = assemble_replace_dict(command, use_gpu, additions, queue, time, ngpu, self_gpu_avail, imports, work_dir)
     submit_torque_job(replace_dict, additional_options, monitor_job, user, sleep, verbose)
 
-def run_slurm_job_(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu):
+def run_slurm_job_(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu, no_bashrc):
     job_dict=dict(command=command,
                   name=name,
                   ngpus=ngpus,
@@ -30,7 +30,8 @@ def run_slurm_job_(command, name, ngpus, nodes, ppn, additions, time, additional
                   gpu_share_mode=gpu_share_mode,
                   imports='\n'.join(imports),
                   work_dir=work_dir,
-                  cpu_gpu=cpu_gpu)
+                  cpu_gpu=cpu_gpu,
+                  no_bashrc=no_bashrc)
     assemble_submit_slurm(job_dict)
 
 @job.command()
@@ -67,9 +68,10 @@ def run_torque_job(command, use_gpu, additions, queue, time, ngpu, additional_op
 @click.option('-i', '--imports', multiple=True, default=[''], help='Place above gpu assignment to make additional import statements.', show_default=True)
 @click.option('-w', '--work_dir', default='', help='Working directory.', show_default=True)
 @click.option('-cg', '--cpu_gpu', default=8, help='Number cpus per gpu.', show_default=True)
-def run_slurm_job(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu):
+@click.option('-nb', '--no_bashrc', is_flag=True, help='Do not run bashrc when running a job.', show_default=True)
+def run_slurm_job(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu, no_bashrc):
     """Run torque job."""
-    run_slurm_job_(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu)
+    run_slurm_job_(command, name, ngpus, nodes, ppn, additions, time, additional_options, account, partition, gpu_share_mode, imports, work_dir, cpu_gpu, no_bashrc)
 
 
 if __name__ == '__main__':
