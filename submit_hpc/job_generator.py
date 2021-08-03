@@ -132,6 +132,7 @@ def assemble_submit_slurm(job_dict):
 #SBATCH --ntasks-per-node={job_dict.get("ppn",1)}
 #SBATCH --time={job_dict.get("time",1)}:00:00
 #SBATCH --job-name={(job_dict.get("name","slurm_job") if job_dict.get("name","") else "")}
+#SBATCH --mem={job_dict.get("mem",8)}G
 {gpu_txt}
 {account_txt}
 {partition_txt}
