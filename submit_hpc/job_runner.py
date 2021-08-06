@@ -59,7 +59,7 @@ def run_torque_job(command, use_gpu, additions, queue, time, ngpu, additional_op
 @click.option('-nm', '--name', default='', help='Job name.', show_default=True)
 @click.option('-ng', '--ngpus', default=0, help='Number of gpus to request.', show_default=True)
 @click.option('-n', '--nodes', default=1, help='Number of nodes to request.', show_default=True)
-@click.option('-ppn', '--ppn', default=1, help='Number of processors per node to request.', show_default=True)
+@click.option('-ppn', '--ppn', default=8, help='Number of processors per node to request.', show_default=True)
 @click.option('-a', '--additions', multiple=True, default=[''], help='Additional commands to add.', show_default=True)
 @click.option('-t', '--time', default=1, help='Walltime in hours for job.', show_default=True)
 @click.option('-ao', '--additional_options', default='', help='Additional options to add for torque run.', type=click.Path(exists=False))
