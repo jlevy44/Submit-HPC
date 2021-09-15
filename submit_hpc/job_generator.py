@@ -118,25 +118,28 @@ def assemble_run_torque(command, use_gpu, additions, queue, time, ngpu, addition
     return job
 
 def assemble_submit_slurm(job_dict):
-    gpu_txt=f"#SBATCH --gres=gpu:{job_dict.get('ngpus',0)}" if job_dict.get("ngpus",0) else "" # --gpus=
-    account_txt=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
-    partition_txt=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
-    gpu_sharing_mode_txt=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}" if (job_dict.get('gpu_share_mode','exclusive')!='exclusive' and job_dict.get("ngpus",0)) else ''
-    nodes_txt=f"#SBATCH --nodes={job_dict.get('nodes',1)}" if job_dict.get("nodes",1) else ""
+    additional_txt={}
+    additional_txt['gpu']=f"#SBATCH --gres=gpu:{job_dict.get('ngpus',0)}" if job_dict.get("ngpus",0) else "" # --gpus=
+    additional_txt['account']=f"#SBATCH --account={job_dict.get('account','')}" if job_dict.get("account","") else ""
+    additional_txt['partition']=f"#SBATCH --partition={job_dict.get('partition','')}" if job_dict.get("partition","") else ""
+    additional_txt['gsm']=f"#SBATCH --gpu_cmode={job_dict.get('gpu_share_mode','exclusive')}" if (job_dict.get('gpu_share_mode','exclusive')!='exclusive' and job_dict.get("ngpus",0)) else ''
+    additional_txt['nodes']=f"#SBATCH --nodes={job_dict.get('nodes',1)}" if job_dict.get("nodes",1) else ""
+    additional_txt['exclude']=f"#SBATCH --exclude={job_dict.get('exclude','')}" if job_dict.get('exclude','') else ""
     deprecated_options=f"""#SBATCH --cpus-per-gpu={job_dict.get("cpu_gpu",8)}
 #SBATCH --cpus-per-task=1
 """
     directives=f"""#!/bin/bash
 #SBATCH --chdir={job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
-{nodes_txt}
+{additional_txt['nodes']}
 #SBATCH --ntasks-per-node={job_dict.get("ppn",1)}
 #SBATCH --time={job_dict.get("time",1)}:00:00
 #SBATCH --job-name={(job_dict.get("name","slurm_job") if job_dict.get("name","") else "")}
 #SBATCH --mem={job_dict.get("mem",8)}G
-{gpu_txt}
-{account_txt}
-{partition_txt}
-{gpu_sharing_mode_txt}
+{additional_txt['gpu']}
+{additional_txt['account']}
+{additional_txt['partition']}
+{additional_txt['exclude']}
+{additional_txt['gsm']}
 {"" if job_dict.get("no_bashrc",False) else "source ~/.bashrc"}
 cd {job_dict.get("work_dir",os.getcwd()) if job_dict.get("work_dir","") else os.getcwd()}
 {job_dict.get("imports","")}
